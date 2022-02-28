@@ -7,26 +7,13 @@ RUN apt update -y \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-# mamba installを使いたかったがdatalad pushに失敗するため
-# conda installを利用している（2/2時点）
-RUN conda install --quiet --yes git-annex==8.20210903 \
-    && conda install --quiet --yes git==2.35.0 \
-    && conda install --quiet --yes datalad==0.15.4 \
+RUN mamba install --quiet --yes git==2.35.0 \
     && conda clean -i -t -y
 
 # install the notebook package etc.
 RUN pip install --no-cache --upgrade pip \
-    && pip install --no-cache notebook \
-    && pip install --no-cache jupyter_contrib_nbextensions \
-    && pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through \
-    && pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-multi_outputs \
-    && pip install --no-cache datalad==0.15.4 \
-    && pip install --no-cache lxml==4.7.1 \
-    && pip install --no-cache blockdiag==3.0.0 \
-    && pip install --no-cache nbformat==5.1.3 \
-    && pip install --no-cache papermill==2.3.3 \
-    && pip install --no-cache black==21.12b0
-
+    && pip install --no-cache nbmake
+    
 RUN jupyter contrib nbextension install --user \
     && jupyter nbextensions_configurator enable --user \
     && jupyter run-through quick-setup --user \
@@ -59,4 +46,4 @@ RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
 # Specify the default command to run
-CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]
+# CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]
